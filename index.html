@@ -788,6 +788,101 @@ button.playing {
 
 })();
 </script>
+<script>
+(() => {
+  const playBtns = document.querySelectorAll('.play-btn');
+  let audioCtx = null;
+  let currentAudio = null;
+  let analyser = null;
+  let drawRaf = null;
+
+  function initAudioContext() {
+    if (!audioCtx || audioCtx.state === 'closed') {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function stopCurrent() {
+    if (currentAudio) currentAudio.pause();
+    if (drawRaf) cancelAnimationFrame(drawRaf);
+    document.querySelectorAll('.visualizer').forEach(c => c.style.display = 'none');
+    document.querySelectorAll('.play-btn').forEach(b => b.classList.remove('playing'));
+  }
+
+  function drawVisualizer(analyser, canvas) {
+    const ctx = canvas.getContext('2d');
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    const ratio = window.devicePixelRatio || 1;
+    canvas.width = Math.floor(canvas.clientWidth * ratio);
+    canvas.height = Math.floor(canvas.clientHeight * ratio);
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+    let hue = 0;
+    function loop() {
+      drawRaf = requestAnimationFrame(loop);
+      analyser.getByteFrequencyData(dataArray);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const barWidth = 10;
+      const gap = 5;
+      const totalWidth = bufferLength * (barWidth + gap);
+      const startX = (canvas.width / ratio - totalWidth) / 2;
+      let x = startX;
+
+      hue = (hue + 1) % 360;
+      for (let i = 0; i < bufferLength; i++) {
+        const v = dataArray[i];
+        const h = (v / 255) * (canvas.height / ratio);
+        ctx.fillStyle = `hsl(${(hue + i * 15) % 360}, 100%, 50%)`;
+        ctx.fillRect(x, (canvas.height / ratio) - h, barWidth, h);
+        x += barWidth + gap;
+      }
+    }
+    loop();
+  }
+
+  playBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const audioId = btn.dataset.audio;
+      const canvasId = btn.dataset.vis;
+      const audioEl = document.getElementById(audioId);
+      const canvas = document.getElementById(canvasId);
+
+      initAudioContext();
+      if (currentAudio === audioEl && !audioEl.paused) {
+        stopCurrent();
+        return;
+      }
+
+      stopCurrent();
+      currentAudio = audioEl;
+
+      // Connect analyser
+      if (!audioEl._analyser) {
+        const src = audioCtx.createMediaElementSource(audioEl);
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 64;
+        src.connect(analyser);
+        analyser.connect(audioCtx.destination);
+        audioEl._analyser = analyser;
+      } else {
+        analyser = audioEl._analyser;
+      }
+
+      audioEl.play();
+      drawVisualizer(analyser, canvas);
+      canvas.style.display = 'block';
+      btn.classList.add('playing');
+
+      audioEl.onended = stopCurrent;
+    });
+  });
+
+  document.querySelectorAll('.visualizer').forEach(c => c.style.display = 'none');
+})();
+</script>
 
 
 </body>
