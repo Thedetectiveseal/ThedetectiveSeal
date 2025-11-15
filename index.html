@@ -802,45 +802,6 @@ button.playing {
 
 })();
 </script>
-<script>
-(() => {
-  const playBtns = document.querySelectorAll('.play-btn');
-  let currentAudio = null;
-
-  function stopCurrent() {
-    if (currentAudio) {
-      currentAudio.pause();
-      currentAudio.currentTime = 0;
-      document.querySelectorAll('.play-btn').forEach(b => b.classList.remove('playing'));
-      currentAudio = null;
-    }
-  }
-
-  playBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const audioId = btn.dataset.audio;
-      const audioEl = document.getElementById(audioId);
-
-      if (currentAudio && currentAudio === audioEl) {
-        // pause if already playing
-        stopCurrent();
-        return;
-      }
-
-      stopCurrent(); // stop previous audio
-
-      currentAudio = audioEl;
-      audioEl.play();
-      btn.classList.add('playing');
-
-      audioEl.onended = () => {
-        btn.classList.remove('playing');
-        currentAudio = null;
-      };
-    });
-  });
-})();
-</script>
 
 
 </body>
