@@ -252,7 +252,7 @@ button.playing {
 <script>
 (() => {
   // --- Existing music/playback code remains untouched ---
-  const playBtns = document.querySelectorAll('.play-btn');
+  const  = document.querySelectorAll('.play-btn');
   const canvases = {};
   document.querySelectorAll('.visualizer').forEach(c => canvases[c.id] = c);
 
@@ -423,23 +423,7 @@ button.playing {
     }
   }
 
-  playBtns.forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const audioId = btn.dataset.audio;
-      const visId = btn.dataset.vis;
-      const audioEl = document.getElementById(audioId);
-      const canvas = document.getElementById(visId);
-
-      if (isPlaying && currentCanvas === canvas) {
-        stopCurrent();
-        return;
-      }
-
-      const url = audioEl.src;
-      let ok = await fetchAndPlay(url, btn, canvas);
-      if (!ok) await fallbackPlay(audioEl, btn, canvas);
-    });
-  });
+ fetchAndPlay error: EncodingError: Unable to decode audio data
 
   document.querySelectorAll('.visualizer').forEach(c => c.style.display = 'none');
 
