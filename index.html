@@ -1074,6 +1074,111 @@ button.playing {
   document.querySelectorAll('.visualizer').forEach(c => c.style.display = 'none');
 })();
 </script>
+<script>
+(() => {
+  const playBtns = document.querySelectorAll('.play-btn');
+  const audioElements = {}; // cache for <audio> elements
+  const sources = {};       // cache for MediaElementSource
+  let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  let currentAudio = null;
+  let currentAnalyser = null;
+  let drawRaf = null;
+
+  function stopCurrent() {
+    if (currentAudio) currentAudio.pause();
+    if (drawRaf) cancelAnimationFrame(drawRaf);
+    document.querySelectorAll('.visualizer').forEach(c => c.style.display='none');
+    document.querySelectorAll('.play-btn').forEach(b => b.classList.remove('playing'));
+  }
+
+  function drawVisualizer(analyser, canvas) {
+    const ctx = canvas.getContext('2d');
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    const ratio = window.devicePixelRatio || 1;
+    canvas.width = Math.floor(canvas.clientWidth * ratio);
+    canvas.height = Math.floor(canvas.clientHeight * ratio);
+    ctx.setTransform(ratio,0,0,ratio,0,0);
+
+    let hue = 0;
+    function loop() {
+      drawRaf = requestAnimationFrame(loop);
+      analyser.getByteFrequencyData(dataArray);
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+
+      const barWidth = 10;
+      const gap = 5;
+      const totalWidth = bufferLength * (barWidth + gap);
+      let x = (canvas.width/ratio - totalWidth)/2;
+
+      hue = (hue+1)%360;
+
+      for (let i=0;i<bufferLength;i++){
+        const h = (dataArray[i]/255)*(canvas.height/ratio);
+        ctx.fillStyle = `hsl(${(hue+i*15)%360},100%,50%)`;
+        ctx.fillRect(x,(canvas.height/ratio)-h,barWidth,h);
+        x+=barWidth+gap;
+      }
+    }
+    loop();
+  }
+
+  playBtns.forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const audioId = btn.dataset.audio;
+      const canvasId = btn.dataset.vis;
+      const canvas = document.getElementById(canvasId);
+
+      // init audio element
+      if (!audioElements[audioId]) {
+        const el = document.getElementById(audioId);
+        if (!el || !el.src) return console.error('Audio element not found or has no src:', audioId);
+        audioElements[audioId] = el;
+      }
+      const audioEl = audioElements[audioId];
+
+      // stop current if same audio playing
+      if (currentAudio===audioEl && !audioEl.paused) {
+        stopCurrent();
+        return;
+      }
+      stopCurrent();
+      currentAudio = audioEl;
+
+      // create MediaElementSource only once
+      if (!sources[audioId]) {
+        try {
+          sources[audioId] = audioCtx.createMediaElementSource(audioEl);
+          currentAnalyser = audioCtx.createAnalyser();
+          currentAnalyser.fftSize = 64;
+          sources[audioId].connect(currentAnalyser);
+          currentAnalyser.connect(audioCtx.destination);
+        } catch(e) {
+          console.error('Failed to create MediaElementSource:', e);
+          audioEl.play(); // fallback plain play
+          return;
+        }
+      } else {
+        currentAnalyser = sources[audioId].context ? sources[audioId].context.createAnalyser() : currentAnalyser;
+      }
+
+      try {
+        await audioEl.play();
+      } catch(err){
+        console.error('Playback failed:', err);
+        return;
+      }
+
+      btn.classList.add('playing');
+      canvas.style.display='block';
+      drawVisualizer(currentAnalyser, canvas);
+
+      audioEl.onended = stopCurrent;
+    });
+  });
+
+})();
+</script>
 
 
 </body>
