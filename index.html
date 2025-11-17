@@ -588,5 +588,201 @@
     });
   })();
 </script>
+  <script>
+(() => {
+  const playBtns = document.querySelectorAll('.play-btn');
+  const canvases = {};
+  document.querySelectorAll('.visualizer').forEach(c => canvases[c.id] = c);
+
+  let audioCtx = null;
+  const sources = new Map();
+  let currentAudio = null;
+  let currentCanvas = null;
+  let drawRaf = null;
+
+  // === Visualizer theme selector ===
+  const themeSelector = document.createElement("select");
+  themeSelector.innerHTML = `
+    <option value="bars">Bars</option>
+    <option value="circle">Circle</option>
+    <option value="wave">Wave</option>
+  `;
+  themeSelector.style.margin = "10px";
+  document.getElementById("playlist-container").prepend(themeSelector);
+
+  // === Shuffle button ===
+  const shuffleBtn = document.createElement("button");
+  shuffleBtn.textContent = "Shuffle Play";
+  shuffleBtn.style.margin = "10px";
+  document.getElementById("playlist-container").prepend(shuffleBtn);
+
+  shuffleBtn.addEventListener("click", () => {
+    const buttons = Array.from(document.querySelectorAll(".play-btn"));
+    const randomBtn = buttons[Math.floor(Math.random() * buttons.length)];
+    randomBtn.click();
+  });
+
+  async function ensureAudioContext() {
+    if (!audioCtx || audioCtx.state === 'closed') {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+      try { await audioCtx.resume(); } catch {}
+    }
+    return audioCtx;
+  }
+
+  function prepareCanvas(canvas) {
+    const ctx = canvas.getContext('2d');
+    const rect = canvas.getBoundingClientRect();
+    const ratio = window.devicePixelRatio || 1;
+    canvas.width = Math.max(1, Math.floor(rect.width * ratio));
+    canvas.height = Math.max(1, Math.floor(rect.height * ratio));
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    return ctx;
+  }
+
+  function stopCurrent() {
+    if (drawRaf) { cancelAnimationFrame(drawRaf); drawRaf = null; }
+    document.querySelectorAll('.visualizer').forEach(c => c.style.display = 'none');
+    document.querySelectorAll('.play-btn').forEach(b => b.classList.remove('playing'));
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio = null;
+    }
+    currentCanvas = null;
+  }
+
+  function drawVisualizer(analyser, canvas, theme) {
+    const ctx = prepareCanvas(canvas);
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+
+    function loop() {
+      drawRaf = requestAnimationFrame(loop);
+      analyser.getByteFrequencyData(dataArray);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (theme === "bars") {
+        const barWidth = 10;
+        const gap = 5;
+        let x = 0;
+        for (let i = 0; i < bufferLength; i++) {
+          const v = dataArray[i];
+          const h = (v / 255) * canvas.height;
+          ctx.fillStyle = "#38e3be";
+          ctx.fillRect(x, canvas.height - h, barWidth, h);
+          x += barWidth + gap;
+        }
+      } else if (theme === "circle") {
+        const radius = Math.min(canvas.width, canvas.height) / 4;
+        ctx.beginPath();
+        ctx.arc(canvas.width/2, canvas.height/2, radius + dataArray[0]/2, 0, Math.PI*2);
+        ctx.strokeStyle = "#38e3be";
+        ctx.lineWidth = 4;
+        ctx.stroke();
+      } else if (theme === "wave") {
+        ctx.beginPath();
+        ctx.moveTo(0, canvas.height/2);
+        for (let i = 0; i < bufferLength; i++) {
+          const x = (i / bufferLength) * canvas.width;
+          const y = canvas.height/2 + (dataArray[i] - 128);
+          ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = "#38e3be";
+        ctx.stroke();
+      }
+    }
+    loop();
+  }
+
+  async function playWithVisualizer(audioEl, canvas, button) {
+    await ensureAudioContext();
+    if (!sources.has(audioEl)) {
+      const source = audioCtx.createMediaElementSource(audioEl);
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 128;
+      source.connect(analyser);
+      analyser.connect(audioCtx.destination);
+      sources.set(audioEl, { source, analyser });
+    }
+
+    stopCurrent();
+    canvas.style.display = 'block';
+    button.classList.add('playing');
+
+    try { await audioEl.play(); } catch (e) { console.error(e); return; }
+
+    currentAudio = audioEl;
+    currentCanvas = canvas;
+    const { analyser } = sources.get(audioEl);
+    drawVisualizer(analyser, canvas, themeSelector.value);
+    audioEl.onended = () => stopCurrent();
+  }
+
+  playBtns.forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const audioId = btn.dataset.audio;
+      const visId = btn.dataset.vis;
+      const audioEl = document.getElementById(audioId);
+      const canvas = document.getElementById(visId);
+
+      if (currentAudio === audioEl) {
+        stopCurrent();
+        return;
+      }
+      await playWithVisualizer(audioEl, canvas, btn);
+    });
+  });
+
+  // === Secret code unlock for Smooth Operator ===
+  let typed = "";
+  window.addEventListener("keydown", (e) => {
+    typed += e.key.toLowerCase();
+    if (typed.length > 10) typed = typed.slice(-10);
+    if (typed.includes("seal")) {
+      // Reveal sticky notes
+      document.querySelectorAll(".sticky-note").forEach(note => note.style.display = "block");
+      // Reveal hidden Smooth Operator track
+      let secretBtn = document.getElementById("smooth-btn");
+      if (!secretBtn) {
+        const audioEl = document.createElement("audio");
+        audioEl.id = "smooth";
+        audioEl.src = "smooth.mp3";
+        audioEl.preload = "auto";
+        document.body.appendChild(audioEl);
+
+        const btn = document.createElement("button");
+        btn.className = "play-btn";
+        btn.id = "smooth-btn";
+        btn.dataset.audio = "smooth";
+        btn.dataset.vis = "viz-smooth";
+        btn.textContent = "Play / Pause Smooth Operator";
+        document.getElementById("playlist-container").appendChild(btn);
+
+        const canvas = document.createElement("canvas");
+        canvas.className = "visualizer";
+        canvas.id = "viz-smooth";
+        document.getElementById("playlist-container").appendChild(canvas);
+
+        // Hook up new button
+        btn.addEventListener("click", async () => {
+          const audioEl = document.getElementById("smooth");
+          const canvas = document.getElementById("viz-smooth");
+          if (currentAudio === audioEl) {
+            stopCurrent();
+            return;
+          }
+          await playWithVisualizer(audioEl, canvas, btn);
+        });
+      }
+    }
+  });
+
+  // Hide sticky notes initially
+  document.querySelectorAll(".sticky-note").forEach(note => note.style.display = "none");
+})();
+</script>
+
 </body>
 </html>
