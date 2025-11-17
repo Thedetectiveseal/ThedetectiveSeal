@@ -217,7 +217,7 @@
         </select>
       </div>
 
-      <!-- Playlist buttons + canvases (audio elements declared at bottom) -->
+      <!-- Playlist buttons + canvases ( elements declared at bottom) -->
       <button class="play-btn" data-audio="song1" data-vis="viz1">Finale</button>
       <canvas class="visualizer" id="viz1"></canvas>
 
@@ -452,16 +452,17 @@
       drawVisualizer(analyser, canvas);
 
       // Auto-advance to next track
-      audioEl.onended = () => {
-        const next = currentIndex + 1;
-        if (next < playBtns.length) {
-          playIndex(next);
-        } else {
-          stopAll();
-          currentIndex = -1;
-        }
-      };
-    }
+// Auto-advance to next track, loop back to start
+audioEl.onended = () => {
+  const next = currentIndex + 1;
+  if (next < playBtns.length) {
+    playIndex(next);
+  } else {
+    // loop back to the first track
+    playIndex(0);
+  }
+};
+
 
     // Button click handlers (playlist entries)
     playBtns.forEach((btn, i) => {
