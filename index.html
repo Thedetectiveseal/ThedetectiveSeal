@@ -582,5 +582,35 @@
     animateSeal();
   })();
   </script>
+  <script>
+(() => {
+  const notes = document.querySelectorAll(".sticky-note");
+
+  notes.forEach(note => {
+    let isDragging = false;
+    let offsetX = 0, offsetY = 0;
+
+    note.addEventListener("mousedown", e => {
+      isDragging = true;
+      offsetX = e.clientX - note.offsetLeft;
+      offsetY = e.clientY - note.offsetTop;
+      note.style.position = "fixed"; // ensure fixed positioning
+      note.style.zIndex = 10001; // bring to front while dragging
+    });
+
+    window.addEventListener("mousemove", e => {
+      if (!isDragging) return;
+      note.style.left = (e.clientX - offsetX) + "px";
+      note.style.top = (e.clientY - offsetY) + "px";
+    });
+
+    window.addEventListener("mouseup", () => {
+      isDragging = false;
+      note.style.zIndex = 10000; // reset z-index
+    });
+  });
+})();
+</script>
+
 </body>
 </html>
