@@ -815,7 +815,7 @@ button.playing {
     source.connect(analyser);
     analyser.connect(audioCtx.destination);
 
-    analyser.fftSize = 32;
+    analyser.fftSize = 256;
     const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
 
@@ -855,11 +855,10 @@ button.playing {
     });
   }
 
-  // Hook up buttons
+  // Hook up buttons (only toggle play/pause)
   document.querySelectorAll(".play-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const audioId = btn.dataset.audio;
-      const canvasId = btn.dataset.vis;
       const audioElement = document.getElementById(audioId);
 
       if (audioElement.paused) {
@@ -867,12 +866,14 @@ button.playing {
       } else {
         audioElement.pause();
       }
-
-      // Initialize visualizer for this track
-      fetchAndPlay(audioId, canvasId);
     });
   });
+
+  // Initialize visualizers once (not inside button clicks)
+  fetchAndPlay("song3", "viz3"); // Nope
+  fetchAndPlay("song5", "viz5"); // Mirrors demo
 </script>
+
 
 
 </body>
