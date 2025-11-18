@@ -169,7 +169,8 @@
         seal:  { id: "smooth-audio",   title: "Smooth Operator", src: "smooth.mp3" },
         depNope:    { id: "nope-audio",    title: "Nope",            src: "nope.mp3" },
         depMirrors: { id: "mirrors-audio", title: "Mirrors demo",    src: "mirror.mp3" },
-        aldridge: { id: "riddance-audio", title: "Good Riddance",    src: "good.mp3" }
+        aldridge: { id: "riddance-audio", title: "Good Riddance",    src: "good.mp3" },
+        weezer: { id: "weezer-audio", title: "Buddy Holly",    src: "weezer.mp3" }
         // to add more for dep do dep(name) and then do id:(name)-audio, 
       };
 
@@ -512,6 +513,12 @@
         if(typed.includes("aldridge")) {
           if (!playlist.some(t => t.id === secretTracks.aldridge.id)) {
             playlist.push(secretTracks.aldridge);
+            buildPlaylistUI();
+          }
+        }
+        if(typed.includes("weezer")) {
+          if (!playlist.some(t => t.id === secretTracks.weezer.id)) {
+            playlist.push(secretTracks.weezer);
             buildPlaylistUI();
           }
         }
