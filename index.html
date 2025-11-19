@@ -117,6 +117,7 @@
         <div style="display:flex;gap:6px;align-items:center;">
           <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1" />
           <button id="muteBtn">Mute</button>
+          <button id="loopBtn">Loop Off</button>
         </div>
       </div>
 
@@ -384,6 +385,7 @@
         currentIndex = index;
         currentAudio = audioEl;
         currentCanvas = canvas;
+        currentAudio.loop = loopEnabled;
 
         const track = playlist[index];
         trackInfo.textContent = `Playing: ${track.title}`;
@@ -491,6 +493,7 @@
           }
           if (currentIndex >= 0) playIndex(currentIndex);
           else if (playBtns.length > 0) playIndex(0);
+          
           return;
         }
         if (key === "arrowleft") { prevBtn.click(); return; }
@@ -628,6 +631,14 @@
         tx = e.clientX - 25;
         ty = e.clientY - 25;
       });
+      let loopEnabled = false;
+
+document.getElementById("loopBtn").addEventListener("click", () => {
+  loopEnabled = !loopEnabled;
+  if (currentAudio) currentAudio.loop = loopEnabled;
+  document.getElementById("loopBtn").textContent = loopEnabled ? "Loop On" : "Loop Off";
+});
+
 
       function animateSeal() {
         if (!document.body.classList.contains('no-animations')) {
