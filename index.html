@@ -92,7 +92,6 @@
       <button class="open-modal" data-modal="modal3">Seals :)</button>
     </div>
 
-    <!-- New: image-only Niko card -->
     <div class="card niko-card">
       <h2>Niko</h2>
       <div class="img-wrap"><img src="nikoo.jpg" alt="Niko"></div>
@@ -113,7 +112,6 @@
           <option value="circle">Circle</option>
           <option value="wave">Wave</option>
         </select>
-        <!-- Group volume + mute together -->
         <div style="display:flex;gap:6px;align-items:center;">
           <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1" />
           <button id="muteBtn">Mute</button>
@@ -121,7 +119,6 @@
         </div>
       </div>
 
-      <!-- Playlist items injected here -->
       <div class="controls-bottom">
         <button id="prevBtn">Prev</button>
         <button id="nextBtn">Next</button>
@@ -136,11 +133,10 @@
   <div id="modal2" class="modal"><div class="modal-content"><p>So like theres many species of seals, like the um, the um erm um species. Harp Ringed Harbor, Monk, theres more if u want to search it up</p><button class="close-modal">Close</button></div></div>
   <div id="modal3" class="modal"><div class="modal-content"><p>niko (in my opinion) is the best seal, followed by kroshik, then yuki, then yo-chan, but all seals are COOL</p><button class="close-modal">Close</button></div></div>
 
-  <!-- Sticky notes (hidden until secret unlock) -->
+  <!-- Sticky notes -->
   <div class="sticky-note" id="note1">Made by TheDetectiveSeal</div>
   <div class="sticky-note" id="note2">i like seals</div>
 
-  <!-- No animations toggle -->
   <button id="toggle-animations" style="position:fixed;top:10px;right:10px;z-index:10001;">No animations</button>
 
   <script>
@@ -159,21 +155,20 @@
       const volumeSlider = document.getElementById("volumeSlider");
       const muteBtn = document.getElementById("muteBtn");
 
-      // Playlist (initial) — remove Nope/Mirrors so they unlock via "dep"
+      // Playlist (initial)
       let playlist = [
         { id: "song1", title: "Finale", src: "finale.mp3" },
         { id: "song2", title: "Funky Town", src: "funky.mp3" },
         { id: "songSexy", title: "Sexyback", src: "sexy.mp3" }
       ];
 
-      // Secret tracks (unlocked via typing)
+      // Secret tracks
       const secretTracks = {
         seal:  { id: "smooth-audio",   title: "Smooth Operator", src: "smooth.mp3" },
         depNope:    { id: "nope-audio",    title: "Nope",            src: "nope.mp3" },
         depMirrors: { id: "mirrors-audio", title: "Mirrors demo",    src: "mirror.mp3" },
         aldridge: { id: "riddance-audio", title: "Good Riddance",    src: "good.mp3" },
-        weezer: { id: "weezer-audio", title: "Buddy Holly",    src: "weezer.mp3" }
-        // to add more for dep do dep(name) and then do id:(name)-audio, 
+        weezer: { id: "weezer-audio", title: "Buddy Holly",          src: "weezer.mp3" }
       };
 
       // Web Audio + playback state
@@ -185,6 +180,7 @@
       let currentCanvas = null;
       let drawRaf = null;
       let wasMuted = false;
+      let loopEnabled = false; // loop state
 
       // Ensure audio context
       async function ensureCtx() {
@@ -289,6 +285,7 @@
         if (currentAudio) {
           currentAudio.pause();
           currentAudio.onended = null;
+          currentAudio.ontimeupdate = null;
         }
         currentAudio = null;
         currentCanvas = null;
@@ -390,18 +387,26 @@
         const track = playlist[index];
         trackInfo.textContent = `Playing: ${track.title}`;
 
+        // Progress bar update (guard duration)
         audioEl.ontimeupdate = () => {
-          const pct = (audioEl.currentTime / (audioEl.duration || 1)) * 100;
+          if (!audioEl.duration || isNaN(audioEl.duration)) return;
+          const pct = (audioEl.currentTime / audioEl.duration) * 100;
           progressBar.style.width = pct + "%";
         };
 
         const { analyser } = sources.get(audioEl);
+        if (drawRaf) cancelAnimationFrame(drawRaf);
         drawVisualizer(analyser, canvas);
 
+        // Only auto-advance if loop is off
         audioEl.onended = () => {
-          const next = currentIndex + 1;
-          if (next < playBtns.length) playIndex(next);
-          else playIndex(0);
+          if (!loopEnabled) {
+            const next = currentIndex + 1;
+            if (next < playBtns.length) playIndex(next);
+            else playIndex(0);
+          } else {
+            // If loop is on, HTMLAudioElement will restart automatically
+          }
         };
       }
 
@@ -447,7 +452,7 @@
         playIndex(next);
       });
 
-      // Shuffle: reorder playlist and rebuild
+      // Shuffle
       shuffleBtn.addEventListener("click", () => {
         for (let i = playlist.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
@@ -478,6 +483,13 @@
         }
       });
 
+      // Loop toggle button (moved into main script)
+      document.getElementById("loopBtn").addEventListener("click", () => {
+        loopEnabled = !loopEnabled;
+        if (currentAudio) currentAudio.loop = loopEnabled;
+        document.getElementById("loopBtn").textContent = loopEnabled ? "Loop On" : "Loop Off";
+      });
+
       // Secret unlocks + shortcuts
       let typed = "";
       window.addEventListener("keydown", (e) => {
@@ -493,7 +505,6 @@
           }
           if (currentIndex >= 0) playIndex(currentIndex);
           else if (playBtns.length > 0) playIndex(0);
-          
           return;
         }
         if (key === "arrowleft") { prevBtn.click(); return; }
@@ -514,26 +525,18 @@
             buildPlaylistUI();
           }
         }
-        if(typed.includes("aldridge")) {
+        if (typed.includes("aldridge")) {
           if (!playlist.some(t => t.id === secretTracks.aldridge.id)) {
             playlist.push(secretTracks.aldridge);
             buildPlaylistUI();
           }
         }
-        if(typed.includes("weezer")) {
+        if (typed.includes("weezer")) {
           if (!playlist.some(t => t.id === secretTracks.weezer.id)) {
             playlist.push(secretTracks.weezer);
             buildPlaylistUI();
           }
         }
-        // Unlock "sexy" -> Sexy Back (still supports secret unlock)
-        // if (typed.includes("sexy")) {
-          // if (!playlist.some(t => t.id === secretTracks.sexy.id)) {
-           //  playlist.push(secretTracks.sexy);
-           //  buildPlaylistUI();
-          // }
-       // }
-        // this is for if i want to add smth later just copy paste ts later change some shi around
 
         // Unlock "dep" -> add Nope + Mirrors to current playlist
         if (typed.includes("dep")) {
@@ -545,7 +548,6 @@
           if (!playlist.some(t => t.id === secretTracks.depMirrors.id)) {
             playlist.push(secretTracks.depMirrors);
             changed = true;
-            // for dep, do copy paste the thing above but change the id yk
           }
           if (changed) buildPlaylistUI();
         }
@@ -631,14 +633,6 @@
         tx = e.clientX - 25;
         ty = e.clientY - 25;
       });
-      let loopEnabled = false;
-
-document.getElementById("loopBtn").addEventListener("click", () => {
-  loopEnabled = !loopEnabled;
-  if (currentAudio) currentAudio.loop = loopEnabled;
-  document.getElementById("loopBtn").textContent = loopEnabled ? "Loop On" : "Loop Off";
-});
-
 
       function animateSeal() {
         if (!document.body.classList.contains('no-animations')) {
