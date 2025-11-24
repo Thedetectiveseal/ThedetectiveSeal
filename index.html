@@ -61,6 +61,39 @@
     @media (max-width: 768px) {
       .cards-container { grid-template-columns: 1fr; }
       .card img { width: 150px; height: 150px; }
+      /* Sticky notes: keep size consistent */
+.sticky-note {
+  width: 200px;   /* adjust to your preferred size */
+  height: auto;
+  position: absolute;
+  cursor: grab;
+  transform: none !important; /* prevent scaling */
+}
+
+/* Fade-in animation for cards */
+.card {
+  opacity: 0;
+  transform: translateY(20px); /* subtle slide up */
+  animation: fadeInUp 0.8s ease forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Optional: staggered fade-in for multiple cards */
+.card:nth-child(1) { animation-delay: 0.2s; }
+.card:nth-child(2) { animation-delay: 0.4s; }
+.card:nth-child(3) { animation-delay: 0.6s; }
+/* add more nth-child rules if you have more cards */
+
     }
   </style>
 </head>
@@ -633,6 +666,34 @@
         tx = e.clientX - 25;
         ty = e.clientY - 25;
       });
+      // Make sticky notes draggable without resizing
+document.querySelectorAll('.sticky-note').forEach(note => {
+  note.addEventListener("mousedown", function(e) {
+    let offsetX = e.clientX - note.offsetLeft;
+    let offsetY = e.clientY - note.offsetTop;
+
+    function mouseMoveHandler(e) {
+      note.style.left = (e.clientX - offsetX) + "px";
+      note.style.top = (e.clientY - offsetY) + "px";
+    }
+
+    function mouseUpHandler() {
+      document.removeEventListener("mousemove", mouseMoveHandler);
+      document.removeEventListener("mouseup", mouseUpHandler);
+    }
+
+    document.addEventListener("mousemove", mouseMoveHandler);
+    document.addEventListener("mouseup", mouseUpHandler);
+  });
+});
+
+// Trigger fade-in once DOM is ready
+window.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll('.card').forEach(card => {
+    card.style.animationPlayState = "running";
+  });
+});
+
 
       function animateSeal() {
         if (!document.body.classList.contains('no-animations')) {
