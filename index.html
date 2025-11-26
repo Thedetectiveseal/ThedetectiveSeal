@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Detectified</title>
-  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@100;400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@100;400;700&amp;display=swap" rel="stylesheet">
   <style>
     body { margin: 0; font-family: "Exo 2", sans-serif; background: url("https://i.imgur.com/ol1MfVj.gif") no-repeat center center fixed; background-size: cover; color: black; cursor: url('https://i.imgur.com/4b7KkzM.png') 16 16, auto; }
 
@@ -92,11 +90,19 @@
 .card:nth-child(1) { animation-delay: 0.2s; }
 .card:nth-child(2) { animation-delay: 0.4s; }
 .card:nth-child(3) { animation-delay: 0.6s; }
+/* Active state for shuffle/loop */
+#shuffleBtn.active, #loopBtn.active { box-shadow: 0 0 18px var(--accent); border-color: #fff; }
+#shuffleBtn.active::after { content: " 🔀"; margin-left:6px; }
+#loopBtn.active::after { content: " 🔁"; margin-left:6px; }
 /* add more nth-child rules if you have more cards */
 
     }
   </style>
-</head>
+<style type="text/css" id="operaUserStyle">
+  video {
+    filter: -opera-shader(url(data:text/plain;base64,Ly8gaHR0cHM6Ly9naXRodWIuY29tL0dQVU9wZW4tRWZmZWN0cy9GaWRlbGl0eUZYLUNBUwovLyB2MwoKdW5pZm9ybSBzaGFkZXIgaUNodW5rOwp1bmlmb3JtIGZsb2F0MiBpQ2h1bmtTaXplOwp1bmlmb3JtIGZsb2F0MiBpTW91c2U7CnVuaWZvcm0gZmxvYXQgaUFyZ3NbMV07Cgpjb25zdCBmbG9hdCBFUFNJT04gPSAwLjE7CmNvbnN0IGZsb2F0IFZfTUlOID0gMDsKY29uc3QgZmxvYXQgVl9MT1cgPSAwLjI1Owpjb25zdCBmbG9hdCBWX01FRCA9IDAuNTsKY29uc3QgZmxvYXQgVl9ISUdIID0gMC43NTsKY29uc3QgZmxvYXQgVl9NQVggPSAxOwoKY29uc3QgZmxvYXQgVEhSRVNIT0xEX0FSRUEgPSA4MDAgKiA2MDA7CmNvbnN0IGZsb2F0IE1JTl9BUkVBID0gNDAwICogMTAwOwpjb25zdCBmbG9hdCBNSU5fU1RSSVAgPSAyMDsKY29uc3QgZmxvYXQgTUFSR0lOID0gMTsKCmZsb2F0MyBwaXhlbChpbnQgeCwgaW50IHksIGZsb2F0MiB4eSkgewogICAgcmV0dXJuIGlDaHVuay5ldmFsKHh5ICsgZmxvYXQyKHgsIHkpKS5yZ2I7Cn0KCmZsb2F0MyBzaGFycGVuKGZsb2F0MiB4eSkgewogICAgZmxvYXQzIGYgPQogICAgICAgIHBpeGVsKC0xLCAtMSwgeHkpICogIDEgKwogICAgICAgIHBpeGVsKCAwLCAtMSwgeHkpICogLTEgKwogICAgICAgIHBpeGVsKCAxLCAtMSwgeHkpICogIDEgKwoKICAgICAgICBwaXhlbCgtMSwgMCwgeHkpICogLTEgICsKICAgICAgICBwaXhlbCggMCwgMCwgeHkpICogLTEgICsKICAgICAgICBwaXhlbCggMSwgMCwgeHkpICogLTEgICsKCiAgICAgICAgcGl4ZWwoLTEsIDEsIHh5KSAqIDEgICArCiAgICAgICAgcGl4ZWwoIDAsIDEsIHh5KSAqIC0xICArCiAgICAgICAgcGl4ZWwoIDEsIDEsIHh5KSAqIDE7CiAgICByZXR1cm4gZiAvIC0xOwp9CgpmbG9hdDQgUkdYMihmbG9hdDIgeHkpIHsKICAgIGZsb2F0NCBjb2xvciA9IGlDaHVuay5ldmFsKHh5KTsKCiAgICBpZiAoaUNodW5rU2l6ZS54ICogaUNodW5rU2l6ZS55IDwgTUlOX0FSRUEpIHsKICAgICAgICByZXR1cm4gY29sb3I7CiAgICB9CgogICAgaWYgKGlDaHVua1NpemUueSA8IE1JTl9TVFJJUCB8fCBpQ2h1bmtTaXplLnggPCBNSU5fU1RSSVApIHsKICAgICAgICByZXR1cm4gY29sb3I7CiAgICB9CgogICAgaWYgKHh5LnggPCBNQVJHSU4gfHwgeHkueCA+IChpQ2h1bmtTaXplLnggLSBNQVJHSU4pIHx8CiAgICAgICAgeHkueSA8IE1BUkdJTiB8fCB4eS55ID4gKGlDaHVua1NpemUueSAtIE1BUkdJTikpIHsKICAgICAgICByZXR1cm4gY29sb3I7CiAgICB9CgogICAgcmV0dXJuIGZsb2F0NChzaGFycGVuKHh5KSwgMSk7Cn0KCmZsb2F0IG1pbjMoZmxvYXQgeCwgZmxvYXQgeSwgZmxvYXQgeikgewogICAgcmV0dXJuIG1pbih4LCBtaW4oeSwgeikpOwp9CgpmbG9hdCBtYXgzKGZsb2F0IHgsIGZsb2F0IHksIGZsb2F0IHopIHsKICAgIHJldHVybiBtYXgoeCwgbWF4KHksIHopKTsKfQoKZmxvYXQgcmNwKGZsb2F0IHYpIHsKICAgIHJldHVybiAxIC8gdjsKfQoKZmxvYXQzIFJHWDMoZmxvYXQyIHh5LCBmbG9hdCBzdHJlbmd0aCkgewogICAgZmxvYXQzIGEgPSBwaXhlbCgtMSwgLTEsIHh5KTsKICAgIGZsb2F0MyBiID0gcGl4ZWwoIDAsIC0xLCB4eSk7CiAgICBmbG9hdDMgYyA9IHBpeGVsKCAxLCAtMSwgeHkpOwoKICAgIGZsb2F0MyBkID0gcGl4ZWwoLTEsIDAsIHh5KTsKICAgIGZsb2F0MyBlID0gcGl4ZWwoIDAsIDAsIHh5KTsKICAgIGZsb2F0MyBmID0gcGl4ZWwoIDEsIDAsIHh5KTsKCiAgICBmbG9hdDMgZyA9IHBpeGVsKC0xLCAxLCB4eSk7CiAgICBmbG9hdDMgaCA9IHBpeGVsKCAwLCAxLCB4eSk7CiAgICBmbG9hdDMgaSA9IHBpeGVsKCAxLCAxLCB4eSk7CgogICAgZmxvYXQgbW5SID0gbWluMyhtaW4zKGQuciwgZS5yLCBmLnIpLCBiLnIsIGgucik7CiAgICBmbG9hdCBtbkcgPSBtaW4zKG1pbjMoZC5nLCBlLmcsIGYuZyksIGIuZywgaC5nKTsKICAgIGZsb2F0IG1uQiA9IG1pbjMobWluMyhkLmIsIGUuYiwgZi5iKSwgYi5iLCBoLmIpOwoKICAgIGZsb2F0IG1uUjIgPSBtaW4zKG1pbjMobW5SLCBhLnIsIGMuciksIGcuciwgaS5yKTsKICAgIGZsb2F0IG1uRzIgPSBtaW4zKG1pbjMobW5HLCBhLmcsIGMuZyksIGcuZywgaS5nKTsKICAgIGZsb2F0IG1uQjIgPSBtaW4zKG1pbjMobW5CLCBhLmIsIGMuYiksIGcuYiwgaS5iKTsKCiAgICBtblIgPSBtblIgKyBtblIyOwogICAgbW5HID0gbW5HICsgbW5HMjsKICAgIG1uQiA9IG1uQiArIG1uQjI7CgogICAgZmxvYXQgbXhSID0gbWF4MyhtYXgzKGQuciwgZS5yLCBmLnIpLCBiLnIsIGgucik7CiAgICBmbG9hdCBteEcgPSBtYXgzKG1heDMoZC5nLCBlLmcsIGYuZyksIGIuZywgaC5nKTsKICAgIGZsb2F0IG14QiA9IG1heDMobWF4MyhkLmIsIGUuYiwgZi5iKSwgYi5iLCBoLmIpOwoKICAgIGZsb2F0IG14UjIgPSBtYXgzKG1heDMobXhSLCBhLnIsIGMuciksIGcuciwgaS5yKTsKICAgIGZsb2F0IG14RzIgPSBtYXgzKG1heDMobXhHLCBhLmcsIGMuZyksIGcuZywgaS5nKTsKICAgIGZsb2F0IG14QjIgPSBtYXgzKG1heDMobXhCLCBhLmIsIGMuYiksIGcuYiwgaS5iKTsKCiAgICBteFIgPSBteFIgKyBteFIyOwogICAgbXhHID0gbXhHICsgbXhHMjsKICAgIG14QiA9IG14QiArIG14QjI7CgogICAgZmxvYXQgcmNwTVIgPSByY3AobXhSKTsKICAgIGZsb2F0IHJjcE1HID0gcmNwKG14Ryk7CiAgICBmbG9hdCByY3BNQiA9IHJjcChteEIpOwoKICAgIGZsb2F0IGFtcFIgPSBzYXR1cmF0ZShtaW4obW5SLCAyIC0gbXhSKSAqIHJjcE1SKTsKICAgIGZsb2F0IGFtcEcgPSBzYXR1cmF0ZShtaW4obW5HLCAyIC0gbXhHKSAqIHJjcE1HKTsKICAgIGZsb2F0IGFtcEIgPSBzYXR1cmF0ZShtaW4obW5CLCAyIC0gbXhCKSAqIHJjcE1CKTsKCiAgICBhbXBSID0gc3FydChhbXBSKTsKICAgIGFtcEcgPSBzcXJ0KGFtcEcpOwogICAgYW1wQiA9IHNxcnQoYW1wQik7CgogICAgZmxvYXQgcGVhayA9IC1yY3AobWl4KDgsIDUsIHN0cmVuZ3RoKSk7CgogICAgZmxvYXQgd1IgPSBhbXBSICogcGVhazsKICAgIGZsb2F0IHdHID0gYW1wRyAqIHBlYWs7CiAgICBmbG9hdCB3QiA9IGFtcEIgKiBwZWFrOwoKICAgIGZsb2F0IHJjcFdlaWdodFIgPSByY3AoMSArIDQgKiB3Uik7CiAgICBmbG9hdCByY3BXZWlnaHRHID0gcmNwKDEgKyA0ICogd0cpOwogICAgZmxvYXQgcmNwV2VpZ2h0QiA9IHJjcCgxICsgNCAqIHdCKTsKCiAgICByZXR1cm4gZmxvYXQzKAogICAgICAgIHNhdHVyYXRlKChiLnIgKiB3UiArIGQuciAqIHdSICsgZi5yICogd1IgKyBoLnIgKiB3UiArIGUucikgKiByY3BXZWlnaHRSKSwKICAgICAgICBzYXR1cmF0ZSgoYi5nICogd0cgKyBkLmcgKiB3RyArIGYuZyAqIHdHICsgaC5nICogd0cgKyBlLmcpICogcmNwV2VpZ2h0RyksCiAgICAgICAgc2F0dXJhdGUoKGIuYiAqIHdCICsgZC5iICogd0IgKyBmLmIgKiB3QiArIGguYiAqIHdCICsgZS5iKSAqIHJjcFdlaWdodEIpKTsKfQoKCmZsb2F0NCBtYWluKGZsb2F0MiB4eSkgewoKICAgIGZsb2F0NCBvcmlnaW5hbENvbG9yID0gaUNodW5rLmV2YWwoeHkpOwogICAgaWYgKG9yaWdpbmFsQ29sb3IuYSA8IDEpIHsKICAgICAgICByZXR1cm4gaUNodW5rLmV2YWwoeHkpOwogICAgfQoKICAgIGZsb2F0IGludGVuc2l0eSA9IGlBcmdzWzBdOwogICAgZmxvYXQgc3RyZW5ndGggPSAwOwogICAgZmxvYXQzIGNvbG9yOwoKICAgIGlmIChpbnRlbnNpdHkgPCBWX01JTiArIEVQU0lPTikgewogICAgICAgIHN0cmVuZ3RoID0gMC4xMDsKICAgICAgICBjb2xvciA9IFJHWDMoeHksIHN0cmVuZ3RoKTsKCiAgICB9IGVsc2UgaWYgKGludGVuc2l0eSA+IFZfTE9XIC0gRVBTSU9OICYmIGludGVuc2l0eSA8IFZfTE9XICsgRVBTSU9OKSB7CiAgICAgICAgc3RyZW5ndGggPSAwLjMzOwogICAgICAgIGNvbG9yID0gUkdYMyh4eSwgc3RyZW5ndGgpOwoKICAgIH0gZWxzZSBpZiAoaW50ZW5zaXR5ID4gVl9NRUQgLSBFUFNJT04gJiYgaW50ZW5zaXR5IDwgVl9NRUQgKyBFUFNJT04pIHsKICAgICAgICBzdHJlbmd0aCA9IDAuNTsKICAgICAgICBjb2xvciA9IFJHWDMoeHksIHN0cmVuZ3RoKTsKCiAgICB9IGVsc2UgaWYgKGludGVuc2l0eSA+IFZfSElHSCAtIEVQU0lPTiAmJiBpbnRlbnNpdHkgPCBWX0hJR0ggKyBFUFNJT04pIHsKICAgICAgICBzdHJlbmd0aCA9IDAuOTk7CiAgICAgICAgY29sb3IgPSBSR1gzKHh5LCBzdHJlbmd0aCk7CgogICAgfSBlbHNlIGlmIChpbnRlbnNpdHkgPiBWX01BWCAtIEVQU0lPTikgewogICAgICAgIHN0cmVuZ3RoID0gMTsKICAgICAgICBjb2xvciA9IFJHWDIoeHkpLnJnYjsKICAgIH0KCiAgICByZXR1cm4gZmxvYXQ0KGNvbG9yLCBvcmlnaW5hbENvbG9yLmEpOwp9) -opera-args(0.75 calc(env(-opera-accent-color-r, 255)/255) calc(env(-opera-accent-color-g, 255)/255) calc(env(-opera-accent-color-b, 255)/255)));
+  }
+</style><style type="text/css"></style><link rel="stylesheet" href="chrome-extension://ihcjicgdanjaechkgeegckofjjedodee/app/content-style.css"></head>
 <body class="blue-theme">
   <div class="fluidjumbo">
     <h1>The (maybe detective) seal's portfolio</h1>
@@ -104,39 +110,39 @@
   </div>
 
   <div class="cards-container">
-    <div class="card race">
+    <div class="card race" style="animation-play-state: running;">
       <h2>Racing / Driving / Cars</h2>
       <p>I like going racing like vroom vroom.</p>
-      <div class="img-wrap"><img src="https://upload.wikimedia.org/wikipedia/commons/5/57/Global_MX-5_Cup_car_-_Tokyo_Auto_Salon_2015.jpg" alt="car"></div>
+      <div class="img-wrap"><img loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/5/57/Global_MX-5_Cup_car_-_Tokyo_Auto_Salon_2015.jpg" alt="car"></div>
       <button class="open-modal" data-modal="modal1">Racing series I like</button>
     </div>
 
-    <div class="card seal">
+    <div class="card seal" style="animation-play-state: running;">
       <h2>Seals</h2>
       <p>If you can't tell, I like seals :)</p>
-      <div class="img-wrap"><img src="niko.webp" alt="seal"></div>
+      <div class="img-wrap"><img loading="lazy" src="niko.webp" alt="seal"></div>
       <button class="open-modal" data-modal="modal2">Seals of choosing</button>
     </div>
 
-    <div class="card seal2">
+    <div class="card seal2" style="animation-play-state: running;">
       <h2>Seal 2</h2>
       <p>Seals and seals and seals...</p>
-      <div class="img-wrap"><img src="yo-chan.jpg" alt="seal2"></div>
+      <div class="img-wrap"><img loading="lazy" src="yo-chan.jpg" alt="seal2"></div>
       <button class="open-modal" data-modal="modal3">Seals :)</button>
     </div>
 
-    <div class="card niko-card">
+    <div class="card niko-card" style="animation-play-state: running;">
       <h2>Niko</h2>
-      <div class="img-wrap"><img src="nikoo.jpg" alt="Niko"></div>
+      <div class="img-wrap"><img loading="lazy" src="nikoo.jpg" alt="Niko"></div>
       <p>niko my beloved</p>
     </div>
   </div>
 
   <!-- Music card pinned to bottom -->
-  <div class="card music">
+  <div class="card music" style="animation-play-state: running;">
     <h2>Music</h2>
-    <div id="trackInfo"></div>
-    <div id="progressContainer"><div id="progressBar"></div></div>
+    <div id="trackInfo"><span id="trackTitle"></span> <span id="trackTime">0:00 / 0:00</span></div>
+    <div id="progressContainer"><div id="progressBar" style="width: 0%;"></div></div>
 
     <div id="playlist-container">
       <div class="controls-top">
@@ -146,13 +152,13 @@
           <option value="wave">Wave</option>
         </select>
         <div style="display:flex;gap:6px;align-items:center;">
-          <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1" />
+          <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
           <button id="muteBtn">Mute</button>
           <button id="loopBtn">Loop Off</button>
         </div>
       </div>
 
-      <div class="controls-bottom">
+      <button class="play-btn" data-audio="song1" data-vis="viz-song1">Finale</button><canvas class="visualizer" id="viz-song1" style="display: none;"></canvas><button class="play-btn" data-audio="song2" data-vis="viz-song2">Funky Town</button><canvas class="visualizer" id="viz-song2" style="display: none;"></canvas><button class="play-btn" data-audio="songSexy" data-vis="viz-songSexy">Sexyback</button><canvas class="visualizer" id="viz-songSexy" style="display: none;"></canvas><div class="controls-bottom">
         <button id="prevBtn">Prev</button>
         <button id="nextBtn">Next</button>
         <button id="shuffleBtn">Shuffle</button>
@@ -195,6 +201,10 @@
         { id: "songSexy", title: "Sexyback", src: "sexy.mp3" }
       ];
 
+      // Shuffle state + original order snapshot
+      let shuffleEnabled = false;
+      let initialPlaylist = playlist.slice();
+
       // Secret tracks
       const secretTracks = {
         seal:  { id: "smooth-audio",   title: "Smooth Operator", src: "smooth.mp3" },
@@ -235,6 +245,14 @@
         canvas.height = Math.max(1, Math.floor(h * ratio));
         ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
         return ctx;
+      }
+
+      // Format seconds -> M:SS
+      function formatTime(s) {
+        if (!s || isNaN(s) || s <= 0) return "0:00";
+        const m = Math.floor(s / 60);
+        const sec = Math.floor(s % 60);
+        return `${m}:${sec.toString().padStart(2, '0')}`;
       }
 
       // Visualizer loop
@@ -322,7 +340,10 @@
         }
         currentAudio = null;
         currentCanvas = null;
-        trackInfo.textContent = "";
+        const tt = document.getElementById('trackTitle');
+        const ttime = document.getElementById('trackTime');
+        if (tt) tt.textContent = "";
+        if (ttime) ttime.textContent = "0:00 / 0:00";
         progressBar.style.width = "0%";
       }
 
@@ -333,12 +354,9 @@
 
       // Build playlist UI
       function buildPlaylistUI() {
-        const children = Array.from(playlistContainer.children);
-        children.forEach(child => {
-          if (child.classList && (child.classList.contains("play-btn") || child.classList.contains("visualizer"))) {
-            playlistContainer.removeChild(child);
-          }
-        });
+        // Remove any previously inserted play buttons / visualizers from the playlist container
+        const existing = playlistContainer.querySelectorAll('.play-btn, .visualizer');
+        existing.forEach(el => el.remove());
 
         playBtns = [];
 
@@ -380,6 +398,7 @@
 
         stopAll();
         currentIndex = -1;
+        if (!shuffleEnabled) initialPlaylist = playlist.slice();
       }
 
       // Playback by index
@@ -418,13 +437,17 @@
         currentAudio.loop = loopEnabled;
 
         const track = playlist[index];
-        trackInfo.textContent = `Playing: ${track.title}`;
+        const tt = document.getElementById('trackTitle');
+        const ttime = document.getElementById('trackTime');
+        if (tt) tt.textContent = `Playing: ${track.title}`;
+        if (ttime) ttime.textContent = `0:00 / 0:00`;
 
-        // Progress bar update (guard duration)
+        // Progress bar + time update (guard duration)
         audioEl.ontimeupdate = () => {
           if (!audioEl.duration || isNaN(audioEl.duration)) return;
           const pct = (audioEl.currentTime / audioEl.duration) * 100;
           progressBar.style.width = pct + "%";
+          if (ttime) ttime.textContent = `${formatTime(audioEl.currentTime)} / ${formatTime(audioEl.duration)}`;
         };
 
         const { analyser } = sources.get(audioEl);
@@ -485,11 +508,22 @@
         playIndex(next);
       });
 
-      // Shuffle
-      shuffleBtn.addEventListener("click", () => {
-        for (let i = playlist.length - 1; i > 0; i--) {
+      // Shuffle (toggle): when enabled, shuffle playlist; when disabled, restore original order
+      function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
-          [playlist[i], playlist[j]] = [playlist[j], playlist[i]];
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+      }
+
+      shuffleBtn.addEventListener("click", () => {
+        shuffleEnabled = !shuffleEnabled;
+        shuffleBtn.classList.toggle('active', shuffleEnabled);
+        if (shuffleEnabled) {
+          shuffleArray(playlist);
+        } else {
+          // restore to snapshot of original order
+          playlist = initialPlaylist.slice();
         }
         buildPlaylistUI();
       });
@@ -520,7 +554,9 @@
       document.getElementById("loopBtn").addEventListener("click", () => {
         loopEnabled = !loopEnabled;
         if (currentAudio) currentAudio.loop = loopEnabled;
-        document.getElementById("loopBtn").textContent = loopEnabled ? "Loop On" : "Loop Off";
+        const loopBtnEl = document.getElementById("loopBtn");
+        loopBtnEl.textContent = loopEnabled ? "Loop On" : "Loop Off";
+        loopBtnEl.classList.toggle('active', loopEnabled);
       });
 
       // Secret unlocks + shortcuts
@@ -599,7 +635,7 @@
       });
       document.querySelectorAll('.close-modal').forEach(btn => {
         btn.addEventListener('click', () => {
-          const m = btn.closest('modal') || btn.closest('.modal');
+          const m = btn.closest('.modal');
           if (m) m.style.display = 'none';
         });
       });
@@ -639,7 +675,7 @@
         window.addEventListener("mouseup", onMouseUp);
       }
     })();
-  </script>
+  </script><audio id="song1" src="finale.mp3" preload="auto"></audio><audio id="song2" src="funky.mp3" preload="auto"></audio><audio id="songSexy" src="sexy.mp3" preload="auto"></audio>
 
   <!-- Seal follower (respects no-animations) -->
   <script>
@@ -648,6 +684,7 @@
       const seal = document.createElement('img');
       seal.id = 'seal-follow';
       seal.src = 'niko.webp';
+      seal.loading = 'lazy';
       seal.style.position = 'fixed';
       seal.style.top = '0px';
       seal.style.left = '0px';
@@ -706,5 +743,6 @@ window.addEventListener("DOMContentLoaded", () => {
       animateSeal();
     })();
   </script>
-</body>
-</html>
+
+
+</body></html>
