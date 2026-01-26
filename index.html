@@ -133,7 +133,30 @@
 
     <div class="card niko-card" style="animation-play-state: running;">
       <h2>Niko</h2>
-      <div class="img-wrap"><img loading="lazy" src="nikoo.jpg" alt="Niko"></div>
+          <a id="dynamic-link" 
+       href="https://sealspinning.neocities.org" 
+       target="_blank" 
+       rel="noopener">
+        <div class="img-wrap"><img loading="lazy" src="nikoo.jpg" alt="Niko"></div>
+    </a>
+
+    <script>
+        const linkElement = document.getElementById('dynamic-link');
+        let hasBeenClicked = false;
+
+        linkElement.addEventListener('click', function(event) {
+            // Only run the swap logic on the very first click
+            if (!hasBeenClicked) {
+                hasBeenClicked = true;
+
+                // We use a small timeout (200ms) to give the browser 
+                // time to 'see' the original sealspinning link first.
+                setTimeout(() => {
+                    this.href = "https://google.com";
+                }, 200);
+            }
+        });
+    </script>
       <p>niko my beloved</p>
     </div>
   </div>
