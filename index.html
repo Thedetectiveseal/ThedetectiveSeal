@@ -85,6 +85,7 @@
       box-shadow: 0 24px 70px rgba(0,0,0,0.45);
       color: white;
       position: relative;
+      overflow: hidden;
     }
 
     .secret-panel h2 { margin-top: 0; }
@@ -98,6 +99,37 @@
       border-radius: 999px;
       padding: 6px 10px;
       cursor: pointer;
+    }
+
+    .dot {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(255,255,255,0.9);
+      border-radius: 50%;
+      pointer-events: none;
+      box-shadow: 0 0 6px rgba(255,255,255,0.8);
+    }
+
+    .visualizer {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 4px;
+      height: 90px;
+      margin: 16px 0 10px;
+      padding: 10px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.06);
+      overflow: hidden;
+    }
+
+    .bar {
+      width: 6px;
+      border-radius: 999px;
+      background: linear-gradient(to top, #38bdf8, #e0f2fe);
+      transform-origin: bottom;
+      opacity: 0.8;
     }
   </style>
 </head>
@@ -127,6 +159,7 @@
 
       <div id="secretTrackInfo"><span id="secretTrackTitle">No track selected</span> <span id="secretTrackTime">0:00 / 0:00</span></div>
       <div id="secretProgressContainer"><div id="secretProgressBar"></div></div>
+      <div id="visualizer" class="visualizer"></div>
 
       <div class="player-buttons">
         <button id="secretPlayBtn">Play</button>
@@ -171,6 +204,7 @@
     const secretMuteBtn = document.getElementById("secretMuteBtn");
     const secretLoopBtn = document.getElementById("secretLoopBtn");
     const secretVolumeSlider = document.getElementById("secretVolumeSlider");
+    const visualizer = document.getElementById("visualizer");
 
     function formatTime(seconds) {
       const mins = Math.floor(seconds / 60);
@@ -202,6 +236,37 @@
     function updateSecretTrackInfo() {
       secretTrackTitle.textContent = secretTracks[0].title;
       secretTrackTime.textContent = "0:00 / 0:00";
+    }
+
+    function createDots() {
+      const count = 24;
+      for (let i = 0; i < count; i++) {
+        const dot = document.createElement("div");
+        dot.className = "dot";
+        dot.style.left = `${Math.random() * 100}%`;
+        dot.style.top = `${Math.random() * 100}%`;
+        dot.style.animation = `drift ${4 + Math.random() * 6}s ease-in-out infinite alternate`;
+        document.body.appendChild(dot);
+      }
+    }
+
+    function createVisualizerBars() {
+      visualizer.innerHTML = "";
+      for (let i = 0; i < 36; i++) {
+        const bar = document.createElement("div");
+        bar.className = "bar";
+        bar.style.height = `${10 + Math.random() * 50}px`;
+        visualizer.appendChild(bar);
+      }
+    }
+
+    function animateVisualizer() {
+      const bars = visualizer.querySelectorAll(".bar");
+      bars.forEach((bar, index) => {
+        const height = 10 + Math.sin((Date.now() / 250) + index * 0.3) * 30 + Math.random() * 20;
+        bar.style.height = `${Math.max(8, height)}px`;
+      });
+      requestAnimationFrame(animateVisualizer);
     }
 
     function playCurrent() {
@@ -240,6 +305,10 @@
 
     playBtn.addEventListener("click", togglePlay);
     secretPlayBtn.addEventListener("click", toggleSecretPlay);
+
+    createDots();
+    createVisualizerBars();
+    animateVisualizer();
 
     audio.addEventListener("timeupdate", updateTime);
     audio.addEventListener("ended", () => {
@@ -315,5 +384,11 @@
     updateTrackInfo();
     updateSecretTrackInfo();
   </script>
+  <style>
+    @keyframes drift {
+      from { transform: translate(0, 0); opacity: 0.3; }
+      to { transform: translate(12px, -12px); opacity: 1; }
+    }
+  </style>
 </body>
 </html>
