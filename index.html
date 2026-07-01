@@ -88,6 +88,32 @@
       overflow: hidden;
     }
 
+    .secret-panel::before {
+      content: "";
+      position: absolute;
+      inset: -20% -10% auto;
+      height: 140px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.22), transparent 70%);
+      filter: blur(18px);
+      pointer-events: none;
+      animation: pulse 6s ease-in-out infinite alternate;
+    }
+
+    .secret-panel::after {
+      content: "";
+      position: absolute;
+      inset: auto -10% -20% -10%;
+      height: 120px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent);
+      transform: rotate(-6deg);
+      pointer-events: none;
+    }
+
+    .secret-panel > * {
+      position: relative;
+      z-index: 1;
+    }
+
     .secret-panel h2 { margin-top: 0; }
     .secret-panel .close-btn {
       position: absolute;
@@ -196,6 +222,7 @@
     const volumeSlider = document.getElementById("volumeSlider");
 
     const secretArea = document.getElementById("secretArea");
+    const secretPanel = document.querySelector(".secret-panel");
     const closeSecretBtn = document.getElementById("closeSecretBtn");
     const secretTrackTitle = document.getElementById("secretTrackTitle");
     const secretTrackTime = document.getElementById("secretTrackTime");
@@ -205,6 +232,12 @@
     const secretLoopBtn = document.getElementById("secretLoopBtn");
     const secretVolumeSlider = document.getElementById("secretVolumeSlider");
     const visualizer = document.getElementById("visualizer");
+    const audioContext = window.AudioContext || window.webkitAudioContext;
+    const secretAudioContext = new audioContext();
+    const secretAnalyser = secretAudioContext.createAnalyser();
+    secretAnalyser.fftSize = 64;
+    const secretFreqData = new Uint8Array(secretAnalyser.frequencyBinCount);
+    let secretSourceNode = null;
 
     function formatTime(seconds) {
       const mins = Math.floor(seconds / 60);
@@ -246,7 +279,7 @@
         dot.style.left = `${Math.random() * 100}%`;
         dot.style.top = `${Math.random() * 100}%`;
         dot.style.animation = `drift ${4 + Math.random() * 6}s ease-in-out infinite alternate`;
-        document.body.appendChild(dot);
+        secretPanel.appendChild(dot);
       }
     }
 
@@ -255,17 +288,39 @@
       for (let i = 0; i < 36; i++) {
         const bar = document.createElement("div");
         bar.className = "bar";
-        bar.style.height = `${10 + Math.random() * 50}px`;
+        bar.style.height = "10px";
         visualizer.appendChild(bar);
+      }
+    }
+
+    function ensureSecretAudioGraph() {
+      if (!secretSourceNode) {
+        secretSourceNode = secretAudioContext.createMediaElementSource(secretAudio);
+        secretSourceNode.connect(secretAnalyser);
+        secretAnalyser.connect(secretAudioContext.destination);
+      }
+      if (secretAudioContext.state === "suspended") {
+        secretAudioContext.resume();
       }
     }
 
     function animateVisualizer() {
       const bars = visualizer.querySelectorAll(".bar");
-      bars.forEach((bar, index) => {
-        const height = 10 + Math.sin((Date.now() / 250) + index * 0.3) * 30 + Math.random() * 20;
-        bar.style.height = `${Math.max(8, height)}px`;
-      });
+      if (!secretAudio.paused && secretAudio.readyState >= 2) {
+        secretAnalyser.getByteFrequencyData(secretFreqData);
+        bars.forEach((bar, index) => {
+          const value = secretFreqData[index] / 255;
+          const height = 10 + value * 80;
+          bar.style.height = `${Math.max(8, height)}px`;
+          bar.style.opacity = `${0.35 + value * 0.8}`;
+        });
+      } else {
+        bars.forEach((bar, index) => {
+          const height = 10 + Math.sin((Date.now() / 400) + index * 0.25) * 8;
+          bar.style.height = `${Math.max(8, height)}px`;
+          bar.style.opacity = "0.35";
+        });
+      }
       requestAnimationFrame(animateVisualizer);
     }
 
@@ -277,6 +332,7 @@
     }
 
     function playSecretCurrent() {
+      ensureSecretAudioGraph();
       secretAudio.src = secretTracks[0].src;
       secretAudio.load();
       secretAudio.play().catch(() => {});
@@ -388,6 +444,11 @@
     @keyframes drift {
       from { transform: translate(0, 0); opacity: 0.3; }
       to { transform: translate(12px, -12px); opacity: 1; }
+    }
+
+    @keyframes pulse {
+      from { transform: translateY(0); opacity: 0.6; }
+      to { transform: translateY(10px); opacity: 1; }
     }
   </style>
 </body>
