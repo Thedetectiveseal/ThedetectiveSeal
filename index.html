@@ -62,16 +62,22 @@
     .secret-area {
       position: fixed;
       inset: 0;
-      display: none;
+      display: flex;
       align-items: center;
       justify-content: center;
       padding: 24px;
       background: radial-gradient(circle at top, #134e4a 0%, #020617 45%, #0b1120 100%);
       z-index: 10;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.5s ease, visibility 0.5s ease, backdrop-filter 0.5s ease;
     }
 
     .secret-area.show {
-      display: flex;
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
     }
 
     .secret-panel {
@@ -86,6 +92,15 @@
       color: white;
       position: relative;
       overflow: hidden;
+      opacity: 0;
+      transform: translateY(18px) scale(0.98);
+      transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+      isolation: isolate;
+    }
+
+    .secret-area.show .secret-panel {
+      opacity: 1;
+      transform: translateY(0) scale(1);
     }
 
     .secret-panel::before {
@@ -107,6 +122,50 @@
       background: linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent);
       transform: rotate(-6deg);
       pointer-events: none;
+    }
+
+    .ambient-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .ambient-layer span {
+      position: absolute;
+      display: block;
+      border-radius: 50%;
+      filter: blur(24px);
+      opacity: 0.28;
+      animation: ambientFloat 10s ease-in-out infinite alternate;
+    }
+
+    .ambient-layer span:nth-child(1) {
+      width: 180px;
+      height: 180px;
+      background: rgba(56, 189, 248, 0.45);
+      top: -40px;
+      left: -30px;
+      animation-duration: 11s;
+    }
+
+    .ambient-layer span:nth-child(2) {
+      width: 220px;
+      height: 220px;
+      background: rgba(34, 211, 238, 0.32);
+      bottom: -60px;
+      right: -40px;
+      animation-duration: 13s;
+    }
+
+    .ambient-layer span:nth-child(3) {
+      width: 140px;
+      height: 140px;
+      background: rgba(255,255,255,0.16);
+      top: 40%;
+      right: 20%;
+      animation-duration: 9s;
     }
 
     .secret-panel > * {
@@ -157,11 +216,49 @@
       transform-origin: bottom;
       opacity: 0.8;
     }
+
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .social-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      text-decoration: none;
+      color: #f8fbff;
+      background: linear-gradient(135deg, rgba(56, 227, 190, 0.16), rgba(56, 189, 248, 0.16));
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      backdrop-filter: blur(10px);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .social-links a:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.28);
+      border-color: rgba(56, 227, 190, 0.45);
+    }
+
+    .social-links .dot-badge {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #38e3be, #38bdf8);
+      box-shadow: 0 0 10px rgba(56, 227, 190, 0.7);
+    }
   </style>
 </head>
 <body>
   <div class="main-card">
-    <h1>The (maybe detective) seal's portfolio</h1>
+    <h1>Nikodriver(3)</h1>
+    <p>this is my page listen to some music theres a secret... go to the links and stuff uh yeah</p>
 
     <div id="trackInfo"><span id="trackTitle">No track selected</span> <span id="trackTime">0:00 / 0:00</span></div>
     <div id="progressContainer"><div id="progressBar"></div></div>
@@ -175,13 +272,29 @@
       <button id="muteBtn">Mute</button>
       <button id="loopBtn">Loop Off</button>
     </div>
+
+    <div class="social-links">
+      <a href="https://www.tiktok.com/@nikodriver3" target="_blank" rel="noopener noreferrer">
+        <span class="dot-badge"></span>
+        TikTok
+      </a>
+      <a href="https://discord.gg/ECBxUNVGW2" target="_blank" rel="noopener noreferrer">
+        <span class="dot-badge"></span>
+        Discord
+      </a>
+    </div>
   </div>
 
   <div id="secretArea" class="secret-area">
     <div class="secret-panel">
+      <div class="ambient-layer" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
       <button id="closeSecretBtn" class="close-btn">Close</button>
-      <h2>Ocean secret</h2>
-      <p>You've found the hidden area tucked inside the first page.</p>
+      <h2>im a secret page</h2>
+      <p>holy moly you found this, well uh heres a goated song</p>
 
       <div id="secretTrackInfo"><span id="secretTrackTitle">No track selected</span> <span id="secretTrackTime">0:00 / 0:00</span></div>
       <div id="secretProgressContainer"><div id="secretProgressBar"></div></div>
@@ -449,6 +562,11 @@
     @keyframes pulse {
       from { transform: translateY(0); opacity: 0.6; }
       to { transform: translateY(10px); opacity: 1; }
+    }
+
+    @keyframes ambientFloat {
+      from { transform: translate3d(0, 0, 0) scale(1); }
+      to { transform: translate3d(20px, -18px, 0) scale(1.08); }
     }
   </style>
 </body>
